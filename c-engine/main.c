@@ -154,6 +154,51 @@ void searchKeywordForAPI(const char* keyword) {
     printf("=== END RESULTS ===\n");
 }
 
+// NEW: Function to trace path between two keywords
+void tracePathBetweenKeywords() {
+    char keyword1[MAX_WORD_LENGTH];
+    char keyword2[MAX_WORD_LENGTH];
+    
+    printf("\n=== PATH TRACING ===\n");
+    printf("Enter first keyword: ");
+    fgets(keyword1, sizeof(keyword1), stdin);
+    keyword1[strcspn(keyword1, "\n")] = 0;
+    
+    printf("Enter second keyword: ");
+    fgets(keyword2, sizeof(keyword2), stdin);
+    keyword2[strcspn(keyword2, "\n")] = 0;
+    
+    char path[MAX_PATH_LENGTH][MAX_WORD_LENGTH];
+    int pathLength = 0;
+    
+    printf("\nSearching for path from '%s' to '%s'...\n", keyword1, keyword2);
+    
+    if (findPathBetweenKeywords(graph, keyword1, keyword2, path, &pathLength)) {
+        printf("\n✓ PATH FOUND! (Length: %d)\n", pathLength);
+        printf("Path: ");
+        for (int i = 0; i < pathLength; i++) {
+            printf("%s", path[i]);
+            if (i < pathLength - 1) printf(" → ");
+        }
+        printf("\n");
+        
+        printf("\nRelationship strength: %d connection(s)\n", pathLength - 1);
+        if (pathLength == 2) {
+            printf("Direct connection (these keywords appear together)\n");
+        } else if (pathLength == 3) {
+            printf("2nd degree connection (connected through 1 intermediate keyword)\n");
+        } else {
+            printf("%d degree connection\n", pathLength - 1);
+        }
+    } else {
+        printf("\n✗ NO PATH FOUND\n");
+        printf("These keywords are not connected in the knowledge graph.\n");
+        printf("They may not exist or have no relationship in the documents.\n");
+    }
+    
+    printf("=== END PATH TRACING ===\n");
+}
+
 // New function for automated processing
 void automatedProcess() {
     printf("AUTOMATED_PROCESS_START\n");
@@ -174,7 +219,8 @@ void showMenu() {
     printf("2. Process Documents\n");
     printf("3. Show Search History\n");
     printf("4. Undo Last Search\n");
-    printf("5. Exit\n");
+    printf("5. Trace Path Between Keywords\n");  // NEW OPTION
+    printf("6. Exit\n");
     printf("Choose an option: ");
 }
 
@@ -246,7 +292,11 @@ int main(int argc, char *argv[]) {
                 }
                 break;
                 
-            case 5:
+            case 5:  // NEW CASE
+                tracePathBetweenKeywords();
+                break;
+                
+            case 6:
                 printf("Exiting system. Goodbye!\n");
                 freeTrie(trie);
                 freeHashTable(hashTable);

@@ -23,6 +23,7 @@ int findOrAddNode(Graph* graph, const char* keyword) {
         strcpy(graph->nodes[graph->nodeCount].keyword, keyword);
         graph->nodes[graph->nodeCount].relatedCount = 0;
         graph->nodes[graph->nodeCount].visited = 0;
+        graph->nodes[graph->nodeCount].parent = -1;  // Initialize parent
         graph->nodeCount++;
         return graph->nodeCount - 1;
     }
@@ -100,6 +101,92 @@ void findRelatedKeywords(Graph* graph, const char* keyword, char related[][MAX_W
     } else {
         *count = 0;
     }
+}
+
+// NEW: Find path between two keywords using BFS with stack-based reconstruction
+int findPathBetweenKeywords(Graph* graph, const char* startKeyword, const char* endKeyword, 
+                            char path[][MAX_WORD_LENGTH], int* pathLength) {
+    *pathLength = 0;
+    
+    // Find start and end node indices
+    int startIndex = -1, endIndex = -1;
+    for (int i = 0; i < graph->nodeCount; i++) {
+        if (strcasecmp(graph->nodes[i].keyword, startKeyword) == 0) {
+            startIndex = i;
+        }
+        if (strcasecmp(graph->nodes[i].keyword, endKeyword) == 0) {
+            endIndex = i;
+        }
+    }
+    
+    // Check if both keywords exist
+    if (startIndex == -1 || endIndex == -1) {
+        return 0; // Keywords not found
+    }
+    
+    // Same keyword
+    if (startIndex == endIndex) {
+        strcpy(path[0], startKeyword);
+        *pathLength = 1;
+        return 1;
+    }
+    
+    // Reset visited flags and parents
+    for (int i = 0; i < graph->nodeCount; i++) {
+        graph->nodes[i].visited = 0;
+        graph->nodes[i].parent = -1;
+    }
+    
+    // BFS to find shortest path
+    int queue[MAX_KEYWORDS];
+    int front = 0, rear = 0;
+    
+    graph->nodes[startIndex].visited = 1;
+    queue[rear++] = startIndex;
+    
+    int found = 0;
+    while (front < rear && !found) {
+        int current = queue[front++];
+        
+        // Check if we reached the destination
+        if (current == endIndex) {
+            found = 1;
+            break;
+        }
+        
+        // Explore neighbors
+        for (int i = 0; i < graph->nodes[current].relatedCount; i++) {
+            int neighbor = graph->nodes[current].related[i];
+            if (!graph->nodes[neighbor].visited) {
+                graph->nodes[neighbor].visited = 1;
+                graph->nodes[neighbor].parent = current;
+                queue[rear++] = neighbor;
+            }
+        }
+    }
+    
+    // If no path found
+    if (!found) {
+        return 0;
+    }
+    
+    // Reconstruct path using stack (going backwards from end to start)
+    int tempPath[MAX_PATH_LENGTH];
+    int tempLength = 0;
+    int current = endIndex;
+    
+    while (current != -1 && tempLength < MAX_PATH_LENGTH) {
+        tempPath[tempLength++] = current;
+        current = graph->nodes[current].parent;
+    }
+    
+    // Reverse the path (stack behavior - LIFO)
+    *pathLength = tempLength;
+    for (int i = 0; i < tempLength; i++) {
+        strcpy(path[i], graph->nodes[tempPath[tempLength - 1 - i]].keyword);
+    }
+    
+    return 1; // Path found
 }
 
 void freeGraph(Graph* graph) {
