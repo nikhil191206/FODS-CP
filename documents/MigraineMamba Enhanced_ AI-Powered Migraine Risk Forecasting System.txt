@@ -1,0 +1,185 @@
+MigraineMamba Enhanced: AI-Powered Migraine Risk
+Forecasting System
+Domain
+AI in Digital Healthcare – Temporal Forecasting for Neurology (Migraine Management)
+
+Project Title
+MigraineMamba Enhanced: Foundation-to-Personal Learning Architecture for Migraine
+Risk Forecasting via Hybrid Clinical-Environmental Data Integration and Bidirectional
+Temporal Modeling
+
+Team Details
+Guide: Dr. Varsha Dange​
+Class & Division: CSE-AIML-E​
+Team Members:
+●​ Sachi Dhoka (Roll No. 37)​
+●​ Ragini Pawar (Roll No. 15)​
+●​ Nikhil Shah (Roll No. 57)​
+●​ Shaktisingh Suryawanshi (Roll No. 60)​
+●​ Sanat Sanjeev (Roll No. 44)​
+
+Abstract
+MigraineMamba Enhanced is a revolutionary AI-powered system that transforms the
+challenge of limited healthcare datasets into a methodological breakthrough through a
+novel foundation-to-personal learning architecture. Built upon comprehensive data, the
+system trains a foundation Mamba model that captures population-level migraine
+
+patterns, then progressively adapts to individual users through continual learning. By
+integrating clinical temporal sequences with real-time environmental data (weather, air
+quality, lunar phases), the system provides highly accurate 24h/48h migraine risk
+predictions with clinical-grade explanations. This approach eliminates the cold-start
+problem while enabling personalized healthcare AI without requiring wearables or
+specialized hardware.
+
+Expected Outcomes
+●​ Highly Accurate Predictions: 24h/48h migraine risk forecasting with target
+AUROC >0.85 through hybrid clinical-environmental modeling​
+●​ Clinical-Grade Explanations: Clear identification of top 3 risk contributors with
+personalized vs. population baseline comparisons​
+●​ Actionable Personalized Recommendations: Daily adaptive tips for sleep, stress,
+exercise, environmental triggers based on individual patterns​
+●​ Professional Healthcare Interface: Clinical-grade web application supporting real
+patient data with comprehensive visualization dashboards​
+●​ Real-World Validation: Clinical effectiveness demonstrated through 15-person
+pilot study with measurable outcome improvements​
+
+Research Gaps Addressed
+Current Limitations in Migraine Prediction Research
+●​ Small Dataset Challenges: Healthcare AI limited by insufficient patient data for
+robust model training​
+●​ Cold-Start Problem: New users receive generic predictions without personalized
+insights​
+
+●​ Hardware Dependency: Most solutions require expensive wearable devices,
+limiting accessibility and clinical adoption​
+●​ Environmental Disconnect: Limited integration of personal triggers with real-time
+environmental factors​
+●​ Scalability Issues: Traditional transformer models have quadratic complexity
+O(n²), challenging real-time clinical deployment​
+●​ Limited Temporal Modeling: Existing approaches struggle with long-range
+dependencies in lifestyle-health correlations​
+
+Our Novel Contributions
+●​ Foundation-to-Personal Architecture: First healthcare AI system to solve small
+dataset limitations through two-phase learning​
+●​ Clinical-Environmental Fusion: Pioneer integration of comprehensive clinical
+records with real-time environmental APIs​
+●​ Mamba Healthcare Application: First deployment of linear complexity O(n)
+state-space models for migraine prediction​
+●​ Explainable Personalization: Novel framework distinguishing individual patterns
+from population baselines with clinical context​
+●​ Software-Only Clinical Approach: Complete elimination of hardware requirements
+while maintaining clinical-grade accuracy​
+●​ Comprehensive Temporal Modeling: Bidirectional pattern recognition across
+multi-year longitudinal clinical data​
+
+System Design
+Foundation-to-Personal Learning Architecture
+Phase 1: Foundation Layer
+Population Data → Feature Engineering → Temporal Modeling → Mamba Training with
+SSL
+Phase 2: Personalization Layer
+User Input → Foundation predictions → Continual Learning → Personal Adaption
+Phase 3: Application Layer
+Web Interface → Risk Dashboard(24/48h predictions) → Personalized Model (Individual
+Pattern Recognition)
+
+Enhanced User Inputs (Software-Based)
+Daily Inputs (Self-reported, <90 seconds per day):
+●​ Sleep Quality: Hours, quality rating (1–5), sleep/wake times​
+●​ Stress Assessment: Level (1–5 Likert), specific stressors, coping activities​
+●​ Dietary Factors: Caffeine intake (cups), water intake (glasses), missed meals,
+trigger foods​
+●​ Physical Activity: Exercise type, duration (minutes), intensity level​
+●​ Environmental Sensitivity: Weather sensitivity (hot/humid/rain), seasonal triggers​
+●​ Lifestyle Factors: Screen time, work stress, travel, routine changes​
+
+Clinical Integration
+●​ Migraine Episodes: Occurrence (yes/no), onset time, pain intensity (1–10 VAS),
+duration​
+
+●​ Symptom Tracking: Aura presence, associated symptoms (nausea, photophobia,
+phonophobia)​
+●​ Treatment Response: Medication usage, effectiveness, side effects​
+●​ Menstrual Correlation: Cycle tracking for female users, hormonal triggers​
+●​ Personal Triggers: Custom trigger identification and tracking​
+
+Comprehensive System Outputs
+●​ Advanced Risk Predictions: 24h/48h Risk Probabilities (Color-coded
+clinical-grade interface, 0–1 scale); Risk Trend Analysis (7-day rolling predictions
+with confidence intervals); Trigger Sensitivity Mapping; Population Comparison​
+●​ Clinical-Grade Risk Analysis: Top Risk Contributors (ranked list, max 3, with
+clinical significance scores); Personalization Insights; Environmental
+Correlations; Temporal Pattern Recognition​
+●​ Personalized Intervention System: Adaptive Daily Recommendations;
+Preventive Action Plans; Healthcare Integration; Historical Analysis​
+
+Enhanced Technology Stack
+Programming Language: Python
+Data Processing & Storage: Pandas & NumPy, Supabase
+Frontend: Next.js, Tailwind CSS
+AI/ML Frameworks: PyTorch, Scikit-learn
+Backend: FastAPI
+Algorithms: Mamba, SSL​
+
+Evaluation Methodology
+●​ Clinical Performance Metrics: AUROC >0.85, Precision/Recall/F1-Score​
+●​ Personalization Effectiveness: Individual improvement >20% over population
+baseline​
+●​ Clinical Utility: Healthcare provider assessment of decision support value​
+●​ Patient Outcomes: Migraine frequency reduction, preventive behavior adoption​
+
+Real-World Validation Protocol​
+Prospective cohort study; Outcome Measures: HIT-6, MIDAS improvement scores,
+patient satisfaction ratings; Statistical Analysis; Safety Assessment
+Comparative Analysis​
+Baseline comparison with traditional ML models and migraine apps; Clinical
+benchmarking; Cost-effectiveness; Accessibility assessment
+
+Innovation and Research Contribution
+Revolutionary Technical Contributions
+1.​ Foundation-to-Personal Learning for Healthcare AI – Novel two-phase
+learning system for small healthcare datasets; scalable across chronic disease
+prediction domains; immediate utility for new patients.​
+2.​ Comprehensive Clinical-Environmental Data Fusion – Multi-modal
+integration, personalized correlation, long-range temporal analysis,
+evidence-based validation.​
+3.​ Mamba Architecture for Clinical Temporal Modeling – First healthcare use of
+state-space models for migraine prediction; linear complexity O(n); bidirectional
+
+processing; scalable to other diseases.​
+4.​ Explainable Clinical Personalization – SHAP-based medical interpretability;
+provider-friendly and patient-understandable explanations.​
+
+Clinical and Research Impact
+●​ Improved Patient Outcomes: Early warning system enabling proactive migraine
+prevention​
+●​ Healthcare Accessibility: Software-only approach eliminates hardware barriers
+and costs​
+●​ Clinical Integration: Compatible with existing healthcare workflows and EHR
+systems​
+●​ Provider Support: Decision support tool with evidence-based recommendations​
+
+Long-term Research Contributions
+●​ Methodological Framework for small datasets in healthcare AI​
+●​ Clinical Validation Model for real-world evaluation​
+●​ Open Science Platform for reproducibility​
+●​ Evidence for software-only approaches in clinical prediction​
+
+Project Deliverables
+●​ Clinical-Grade Web Application – professional interface, real-time prediction,
+HIPAA-compliant, mobile-responsive​
+●​ Validated Foundation Model – trained on 422K+ data points, AUROC >0.85,
+open-source architecture​
+●​ Personalization Framework – continual learning system, clinical validation of
+individual vs. population-based accuracy​
+●​ Clinical Validation Study – 15-participant pilot, statistical analysis, provider
+feedback, safety monitoring​
+●​ Research Publication & Documentation – peer-reviewed paper, technical
+documentation, open-source codebase, industry white paper​
+
+​
+
+​
+
+

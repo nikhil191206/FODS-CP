@@ -1,0 +1,3 @@
+algorithm data structure database search tree graph hash table
+programming computer science software development machine learning
+artificial intelligence neural networks deep learning
