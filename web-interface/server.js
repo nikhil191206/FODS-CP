@@ -151,7 +151,7 @@ function parseMultipartFormData(body, boundary) {
     return files;
 }
 
-// Handle ALL commands for the C engine (Search, Process, History, Undo)
+// Handle ALL commands for the C engine (Search, Process, History, Undo, Path Tracing)
 async function handleCommand(req, res) {
     try {
         let body = '';
@@ -180,11 +180,18 @@ async function handleCommand(req, res) {
 
             let output = '';
             let errorOutput = '';
+            let commandsSent = false;
 
             child.stdout.on('data', (data) => {
                 const text = data.toString();
                 output += text;
                 console.log('📄 C Engine:', text.trim());
+                
+                // Send commands after we see the menu (to avoid timing issues)
+                if (!commandsSent && text.includes('Choose an option:')) {
+                    commandsSent = true;
+                    sendCommandSequence();
+                }
             });
 
             child.stderr.on('data', (data) => {
@@ -193,54 +200,77 @@ async function handleCommand(req, res) {
                 console.error('❌ C Engine Error:', text.trim());
             });
 
-            // Send commands to C engine (simulate user input)
-            const sendCommand = (cmd, delay = 100) => {
-                setTimeout(() => {
-                    child.stdin.write(cmd + '\n');
-                    console.log(`📤 Sent to C engine: ${cmd}`);
-                }, delay);
+            // Send command sequence based on what user clicked
+            const sendCommandSequence = () => {
+                if (command === 1 && input) {
+                    // Search: 1 → search term → 6 (exit)
+                    console.log(`📤 Sending search command for: "${input}"`);
+                    child.stdin.write('1\n');
+                    setTimeout(() => child.stdin.write(input + '\n'), 100);
+                    setTimeout(() => child.stdin.write('6\n'), 500);
+                    setTimeout(() => child.stdin.end(), 800);
+                } else if (command === 2) {
+                    // Process Documents: 2 → 6 (exit)
+                    console.log(`📤 Sending process documents command`);
+                    child.stdin.write('2\n');
+                    setTimeout(() => child.stdin.write('6\n'), 2000); // Wait longer for processing
+                    setTimeout(() => child.stdin.end(), 2500);
+                } else if (command === 3) {
+                    // Show History: 3 → 6 (exit)
+                    console.log(`📤 Sending show history command`);
+                    child.stdin.write('3\n');
+                    setTimeout(() => child.stdin.write('6\n'), 300);
+                    setTimeout(() => child.stdin.end(), 600);
+                } else if (command === 4) {
+                    // Undo Search: 4 → 6 (exit)
+                    console.log(`📤 Sending undo command`);
+                    child.stdin.write('4\n');
+                    setTimeout(() => child.stdin.write('6\n'), 300);
+                    setTimeout(() => child.stdin.end(), 600);
+                } else if (command === 5 && input) {
+                    // NEW: Path Tracing: 5 → keyword1 → keyword2 → 6 (exit)
+                    const keywords = input.split('|');
+                    if (keywords.length !== 2) {
+                        child.kill();
+                        reject(new Error('Invalid path tracing input. Expected format: keyword1|keyword2'));
+                        return;
+                    }
+                    
+                    console.log(`📤 Tracing path: "${keywords[0]}" → "${keywords[1]}"`);
+                    child.stdin.write('5\n');
+                    setTimeout(() => child.stdin.write(keywords[0].trim() + '\n'), 200);
+                    setTimeout(() => child.stdin.write(keywords[1].trim() + '\n'), 400);
+                    setTimeout(() => child.stdin.write('6\n'), 800);
+                    setTimeout(() => child.stdin.end(), 1100);
+                } else {
+                    child.kill();
+                    reject(new Error('Invalid command'));
+                    return;
+                }
             };
-
-            // Command sequence based on what user clicked
-            if (command === 1 && input) {
-                // Search: 1 → search term → 5 (exit)
-                sendCommand('1');
-                sendCommand(input, 200);
-                sendCommand('5', 300);
-            } else if (command === 2) {
-                // Process Documents: 2 → 5 (exit)
-                sendCommand('2');
-                sendCommand('5', 200);
-            } else if (command === 3) {
-                // Show History: 3 → 5 (exit)
-                sendCommand('3');
-                sendCommand('5', 200);
-            } else if (command === 4) {
-                // Undo Search: 4 → 5 (exit)
-                sendCommand('4');
-                sendCommand('5', 200);
-            } else {
-                reject(new Error('Invalid command'));
-                return;
-            }
-
-            // End stdin after sending commands
-            setTimeout(() => {
-                child.stdin.end();
-            }, 500);
 
             child.on('close', (code) => {
                 console.log(`🔚 C Engine exited with code ${code}`);
-                if (code === 0) {
-                    resolve({ output });
-                } else {
-                    reject(new Error(`C Engine failed: ${errorOutput || 'Unknown error'}`));
-                }
+                resolve({ output });
             });
 
             child.on('error', (error) => {
                 reject(new Error(`Failed to start C Engine: ${error.message}`));
             });
+
+            // Timeout after 15 seconds
+            setTimeout(() => {
+                if (!child.killed) {
+                    console.log('⏱️ C Engine timeout - forcing exit');
+                    child.kill('SIGTERM');
+                    setTimeout(() => {
+                        if (!child.killed) {
+                            child.kill('SIGKILL');
+                        }
+                    }, 1000);
+                    resolve({ output }); // Resolve with whatever output we have
+                }
+            }, 15000);
         });
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -265,6 +295,12 @@ server.listen(PORT, () => {
     console.log(`📁 Documents directory: ${DOCUMENTS_DIR}`);
     console.log(`🔧 C Engine path: ${path.join(__dirname, '..', 'c-engine', 'search_engine.exe')}`);
     console.log(`💡 Upload .txt files and use the buttons to interact with C engine`);
+    console.log(`\n📋 Available Commands:`);
+    console.log(`   1. Search keyword`);
+    console.log(`   2. Process documents`);
+    console.log(`   3. Show history`);
+    console.log(`   4. Undo search`);
+    console.log(`   5. Trace path between keywords (NEW!)`);
 });
 
 // Handle graceful shutdown

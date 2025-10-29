@@ -87,6 +87,31 @@ async function undoSearch() {
     parseAndDisplayResults(result);
 }
 
+// NEW: Trace Path between keywords
+async function tracePath() {
+    const keyword1 = document.getElementById('pathKeyword1').value.trim();
+    const keyword2 = document.getElementById('pathKeyword2').value.trim();
+    
+    if (!keyword1 || !keyword2) {
+        showStatus('❌ Please enter both keywords for path tracing', 'error');
+        return;
+    }
+    
+    if (keyword1.toLowerCase() === keyword2.toLowerCase()) {
+        showStatus('❌ Please enter two different keywords', 'error');
+        return;
+    }
+    
+    showStatus(`🔍 Tracing path from "${keyword1}" to "${keyword2}"...`, 'info');
+    
+    try {
+        const result = await sendCommand(5, `${keyword1}|${keyword2}`);
+        parsePathResults(result, keyword1, keyword2);
+    } catch (error) {
+        showStatus(`❌ Path tracing failed: ${error.message}`, 'error');
+    }
+}
+
 // Handle Enter key
 function handleKeyPress(event) {
     if (event.key === 'Enter') {
@@ -112,6 +137,127 @@ async function sendCommand(command, input = '') {
         showStatus(`❌ Command failed: ${error.message}`, 'error');
         throw error;
     }
+}
+
+// NEW: Parse path tracing results
+function parsePathResults(output, keyword1, keyword2) {
+    const card = document.getElementById('pathResultsCard');
+    const container = document.getElementById('pathResults');
+    
+    // Check if path was found
+    const pathFound = output.includes('PATH FOUND');
+    const noPathFound = output.includes('NO PATH FOUND');
+    
+    if (pathFound) {
+        // Extract path
+        const pathMatch = output.match(/Path:\s*(.+?)(?:\n|$)/);
+        let pathNodes = [];
+        
+        if (pathMatch) {
+            pathNodes = pathMatch[1].split('→').map(node => node.trim()).filter(n => n.length > 0);
+        }
+        
+        // Extract path length
+        const lengthMatch = output.match(/Length:\s*(\d+)/);
+        const pathLength = lengthMatch ? parseInt(lengthMatch[1]) : pathNodes.length;
+        
+        // Extract relationship info
+        const connectionsMatch = output.match(/(\d+)\s+connection\(s\)/);
+        const connections = connectionsMatch ? parseInt(connectionsMatch[1]) : pathLength - 1;
+        
+        // Determine connection type
+        let connectionType = '';
+        if (output.includes('Direct connection')) {
+            connectionType = 'Direct connection (these keywords appear together)';
+        } else if (output.includes('2nd degree connection')) {
+            connectionType = '2nd degree connection (connected through 1 intermediate keyword)';
+        } else {
+            const degreeMatch = output.match(/(\d+)\s+degree connection/);
+            if (degreeMatch) {
+                connectionType = `${degreeMatch[1]} degree connection`;
+            } else {
+                connectionType = `${connections} degree connection`;
+            }
+        }
+        
+        // Display successful path
+        container.innerHTML = `
+            <div class="path-visualization">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <i class="fas fa-check-circle" style="color: #48bb78; font-size: 3rem;"></i>
+                    <h3 style="color: #48bb78; margin-top: 10px;">Path Found!</h3>
+                </div>
+                
+                <div class="path-chain">
+                    ${pathNodes.map((node, index) => `
+                        <div class="path-node">${node}</div>
+                        ${index < pathNodes.length - 1 ? '<i class="fas fa-arrow-right path-arrow-icon"></i>' : ''}
+                    `).join('')}
+                </div>
+                
+                <div class="path-info">
+                    <div class="path-info-item">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Path Length:</strong> ${pathLength} node(s)
+                    </div>
+                    <div class="path-info-item">
+                        <i class="fas fa-link"></i>
+                        <strong>Connections:</strong> ${connections} link(s)
+                    </div>
+                    <div class="path-info-item">
+                        <i class="fas fa-project-diagram"></i>
+                        <strong>Relationship:</strong> ${connectionType}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        showStatus('✅ Path found successfully!', 'success');
+        
+    } else if (noPathFound) {
+        // Display no path found
+        container.innerHTML = `
+            <div class="path-visualization">
+                <div class="no-path-message">
+                    <i class="fas fa-unlink"></i>
+                    <h3 style="color: #fc8181; margin-top: 10px;">No Path Found</h3>
+                    <p style="margin-top: 15px;">
+                        The keywords "<strong>${keyword1}</strong>" and "<strong>${keyword2}</strong>" 
+                        are not connected in the knowledge graph.
+                    </p>
+                    <p style="margin-top: 10px; color: #a0aec0;">
+                        This could mean:
+                    </p>
+                    <ul style="text-align: left; display: inline-block; margin-top: 10px;">
+                        <li>One or both keywords don't exist in the documents</li>
+                        <li>They appear in different, unrelated contexts</li>
+                        <li>They don't co-occur within the same document windows</li>
+                    </ul>
+                </div>
+            </div>
+        `;
+        
+        showStatus('ℹ️ No connection found between these keywords', 'info');
+        
+    } else {
+        // Fallback for unexpected output
+        container.innerHTML = `
+            <div class="path-visualization">
+                <div class="no-path-message">
+                    <i class="fas fa-question-circle"></i>
+                    <h3 style="color: #a0aec0;">Unable to determine path</h3>
+                    <p style="margin-top: 15px;">Please try again or check if the keywords exist in the documents.</p>
+                </div>
+            </div>
+        `;
+        
+        showStatus('⚠️ Unable to trace path. Please try again.', 'error');
+    }
+    
+    card.style.display = 'block';
+    
+    // Scroll to results
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // Parse C engine output and display beautifully

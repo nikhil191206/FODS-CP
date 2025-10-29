@@ -113,6 +113,10 @@
             background: linear-gradient(135deg, #48bb78, #38a169);
         }
 
+        .btn-path {
+            background: linear-gradient(135deg, #f6ad55, #ed8936);
+        }
+
         /* Search Section */
         .search-box {
             display: flex;
@@ -147,6 +151,107 @@
             gap: 10px;
         }
 
+        /* Path Tracing Section */
+        .path-input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .path-input-group input {
+            flex: 1;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .path-input-group input:focus {
+            outline: none;
+            border-color: #f6ad55;
+            box-shadow: 0 0 0 3px rgba(246, 173, 85, 0.3);
+        }
+
+        .path-input-group input::placeholder {
+            color: #a0aec0;
+        }
+
+        .path-arrow {
+            display: flex;
+            align-items: center;
+            color: #f6ad55;
+            font-size: 1.5rem;
+        }
+
+        /* Path Visualization */
+        .path-visualization {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(246, 173, 85, 0.3);
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .path-chain {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .path-node {
+            background: linear-gradient(135deg, #f6ad55, #ed8936);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(246, 173, 85, 0.3);
+        }
+
+        .path-arrow-icon {
+            color: #f6ad55;
+            font-size: 1.5rem;
+        }
+
+        .path-info {
+            background: rgba(246, 173, 85, 0.1);
+            border: 1px solid rgba(246, 173, 85, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .path-info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #e0e0e0;
+        }
+
+        .path-info-item i {
+            color: #f6ad55;
+            font-size: 1.2rem;
+        }
+
+        .no-path-message {
+            text-align: center;
+            padding: 40px;
+            color: #a0aec0;
+        }
+
+        .no-path-message i {
+            font-size: 3rem;
+            color: #fc8181;
+            margin-bottom: 15px;
+        }
+
         /* Results Sections */
         .results-container {
             display: none;
@@ -154,7 +259,7 @@
 
         .results-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
@@ -371,6 +476,18 @@
                 flex-direction: column;
                 gap: 10px;
             }
+
+            .path-input-group {
+                flex-direction: column;
+            }
+
+            .path-arrow {
+                transform: rotate(90deg);
+            }
+
+            .path-chain {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -390,7 +507,7 @@
                 <p>Drag & drop .txt files here or click to select</p>
                 <p style="color: #a0aec0; margin-top: 10px;">Files will be processed by the C search engine</p>
             </div>
-            <input type="file" id="fileInput" multiple accept=".txt" onchange="showSelectedFiles()">
+            <input type="file" id="fileInput" multiple accept=".txt" style="display: none;" onchange="showSelectedFiles()">
             <div id="fileList" style="margin-top: 15px;"></div>
             <button class="btn btn-success" onclick="uploadFiles()" style="margin-top: 15px; width: 100%;">
                 <i class="fas fa-upload"></i> Upload & Process Documents
@@ -417,6 +534,32 @@
                 <button class="btn btn-secondary" onclick="undoSearch()">
                     <i class="fas fa-undo"></i> Undo Search
                 </button>
+            </div>
+        </div>
+
+        <!-- NEW: Path Tracing Section -->
+        <div class="card">
+            <h2><i class="fas fa-route"></i> Path Tracing - Find Connection Between Keywords</h2>
+            <p style="color: #a0aec0; margin-bottom: 20px;">
+                Discover how two keywords are connected through the knowledge graph
+            </p>
+            <div class="path-input-group">
+                <input type="text" id="pathKeyword1" placeholder="Enter first keyword...">
+                <div class="path-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                <input type="text" id="pathKeyword2" placeholder="Enter second keyword...">
+            </div>
+            <button class="btn btn-path" onclick="tracePath()" style="width: 100%;">
+                <i class="fas fa-project-diagram"></i> Trace Path
+            </button>
+        </div>
+
+        <!-- NEW: Path Results -->
+        <div class="card results-container" id="pathResultsCard">
+            <h2><i class="fas fa-route"></i> Path Tracing Results</h2>
+            <div id="pathResults">
+                <!-- Path results will be populated here -->
             </div>
         </div>
 
