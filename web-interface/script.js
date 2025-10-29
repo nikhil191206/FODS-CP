@@ -149,12 +149,24 @@ function parsePathResults(output, keyword1, keyword2) {
     const noPathFound = output.includes('NO PATH FOUND');
     
     if (pathFound) {
-        // Extract path
+        // Extract path - handle both -> and → arrows
         const pathMatch = output.match(/Path:\s*(.+?)(?:\n|$)/);
         let pathNodes = [];
         
         if (pathMatch) {
-            pathNodes = pathMatch[1].split('→').map(node => node.trim()).filter(n => n.length > 0);
+            // Split by either -> or → 
+            const pathString = pathMatch[1];
+            if (pathString.includes('->')) {
+                pathNodes = pathString.split('->').map(node => node.trim()).filter(n => n.length > 0);
+            } else if (pathString.includes('→')) {
+                pathNodes = pathString.split('→').map(node => node.trim()).filter(n => n.length > 0);
+            }
+        }
+        
+        // If we still don't have nodes, try to extract from the full output
+        if (pathNodes.length === 0) {
+            console.log('Could not parse path, trying alternative method...');
+            console.log('Full output:', output);
         }
         
         // Extract path length
@@ -188,12 +200,19 @@ function parsePathResults(output, keyword1, keyword2) {
                     <h3 style="color: #48bb78; margin-top: 10px;">Path Found!</h3>
                 </div>
                 
-                <div class="path-chain">
-                    ${pathNodes.map((node, index) => `
-                        <div class="path-node">${node}</div>
-                        ${index < pathNodes.length - 1 ? '<i class="fas fa-arrow-right path-arrow-icon"></i>' : ''}
-                    `).join('')}
-                </div>
+                ${pathNodes.length > 0 ? `
+                    <div class="path-chain">
+                        ${pathNodes.map((node, index) => `
+                            <div class="path-node">${node}</div>
+                            ${index < pathNodes.length - 1 ? '<i class="fas fa-arrow-right path-arrow-icon"></i>' : ''}
+                        `).join('')}
+                    </div>
+                ` : `
+                    <div style="text-align: center; padding: 20px; color: #a0aec0;">
+                        <p>Path exists but visualization unavailable.</p>
+                        <p style="margin-top: 10px; font-size: 0.9em;">Check console for details.</p>
+                    </div>
+                `}
                 
                 <div class="path-info">
                     <div class="path-info-item">

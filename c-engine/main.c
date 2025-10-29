@@ -30,6 +30,7 @@ int isRegularFile(const char* path) {
 
 void initializeSystem() {
     printf("Initializing Knowledge Graph Search System...\n");
+    fflush(stdout);
     trie = createTrieNode();
     hashTable = createHashTable();
     graph = createGraph();
@@ -37,6 +38,7 @@ void initializeSystem() {
     undoStack = createStack();
     redoStack = createStack();
     printf("System initialized successfully!\n");
+    fflush(stdout);
 }
 
 void processDocument(const char* filename) {
@@ -44,6 +46,7 @@ void processDocument(const char* filename) {
     int tokenCount = 0;
     
     printf("Processing document: %s\n", filename);
+    fflush(stdout);
     
     if (tokenizeFile(filename, tokens, &tokenCount)) {
         // Add tokens to Trie and build co-occurrence graph
@@ -60,6 +63,7 @@ void processDocument(const char* filename) {
             }
         }
         printf("  Added %d tokens from %s\n", tokenCount, filename);
+        fflush(stdout);
     }
 }
 
@@ -70,10 +74,12 @@ void processAllDocuments(const char* directoryPath) {
     dir = opendir(directoryPath);
     if (dir == NULL) {
         printf("Error: Cannot open directory %s\n", directoryPath);
+        fflush(stdout);
         return;
     }
     
     printf("\n=== PROCESSING DOCUMENTS FROM: %s ===\n", directoryPath);
+    fflush(stdout);
     
     int fileCount = 0;
     while ((entry = readdir(dir)) != NULL) {
@@ -91,10 +97,12 @@ void processAllDocuments(const char* directoryPath) {
     
     closedir(dir);
     printf("=== PROCESSED %d DOCUMENTS ===\n\n", fileCount);
+    fflush(stdout);
 }
 
 void searchKeywordForAPI(const char* keyword) {
     printf("\n=== SEARCH RESULTS FOR: '%s' ===\n", keyword);
+    fflush(stdout);
     
     // 1. Add to search history
     enqueue(searchHistory, keyword);
@@ -113,18 +121,22 @@ void searchKeywordForAPI(const char* keyword) {
         if (i < suggestionCount - 1) printf(", ");
     }
     printf("\n");
+    fflush(stdout);
     
     // 4. Search in hash table
     HashEntry* entry = searchHashTable(hashTable, keyword);
     if (entry != NULL) {
         printf("FOUND_IN: %d documents\n", entry->docCount);
+        fflush(stdout);
         for (int i = 0; i < entry->docCount; i++) {
             printf("RESULT: %d. %s (frequency: %d)\n", i + 1, 
                    entry->documents[i].filename, 
                    entry->documents[i].frequency);
+            fflush(stdout);
         }
     } else {
         printf("FOUND_IN: 0 documents\n");
+        fflush(stdout);
     }
     
     // 5. Find related keywords
@@ -138,6 +150,7 @@ void searchKeywordForAPI(const char* keyword) {
         if (i < relatedCount - 1) printf(", ");
     }
     printf("\n");
+    fflush(stdout);
     
     // 6. Show search history
     char history[HISTORY_SIZE][MAX_WORD_LENGTH];
@@ -150,21 +163,27 @@ void searchKeywordForAPI(const char* keyword) {
         if (i < historyCount - 1) printf(" → ");
     }
     printf("\n");
+    fflush(stdout);
     
     printf("=== END RESULTS ===\n");
+    fflush(stdout);
 }
 
-// NEW: Function to trace path between two keywords
+// Function to trace path between two keywords
 void tracePathBetweenKeywords() {
     char keyword1[MAX_WORD_LENGTH];
     char keyword2[MAX_WORD_LENGTH];
     
     printf("\n=== PATH TRACING ===\n");
+    fflush(stdout);
+    
     printf("Enter first keyword: ");
+    fflush(stdout);
     fgets(keyword1, sizeof(keyword1), stdin);
     keyword1[strcspn(keyword1, "\n")] = 0;
     
     printf("Enter second keyword: ");
+    fflush(stdout);
     fgets(keyword2, sizeof(keyword2), stdin);
     keyword2[strcspn(keyword2, "\n")] = 0;
     
@@ -172,15 +191,17 @@ void tracePathBetweenKeywords() {
     int pathLength = 0;
     
     printf("\nSearching for path from '%s' to '%s'...\n", keyword1, keyword2);
+    fflush(stdout);
     
     if (findPathBetweenKeywords(graph, keyword1, keyword2, path, &pathLength)) {
-        printf("\n✓ PATH FOUND! (Length: %d)\n", pathLength);
+        printf("\nPATH FOUND! (Length: %d)\n", pathLength);
         printf("Path: ");
         for (int i = 0; i < pathLength; i++) {
             printf("%s", path[i]);
-            if (i < pathLength - 1) printf(" → ");
+            if (i < pathLength - 1) printf(" -> ");
         }
         printf("\n");
+        fflush(stdout);
         
         printf("\nRelationship strength: %d connection(s)\n", pathLength - 1);
         if (pathLength == 2) {
@@ -190,27 +211,34 @@ void tracePathBetweenKeywords() {
         } else {
             printf("%d degree connection\n", pathLength - 1);
         }
+        fflush(stdout);
     } else {
-        printf("\n✗ NO PATH FOUND\n");
+        printf("\nNO PATH FOUND\n");
         printf("These keywords are not connected in the knowledge graph.\n");
         printf("They may not exist or have no relationship in the documents.\n");
+        fflush(stdout);
     }
     
     printf("=== END PATH TRACING ===\n");
+    fflush(stdout);
 }
 
 // New function for automated processing
 void automatedProcess() {
     printf("AUTOMATED_PROCESS_START\n");
+    fflush(stdout);
     processAllDocuments("../documents");
     printf("AUTOMATED_PROCESS_COMPLETE\n");
+    fflush(stdout);
 }
 
 // New function for automated search
 void automatedSearch(const char* query) {
     printf("AUTOMATED_SEARCH_START\n");
+    fflush(stdout);
     searchKeywordForAPI(query);
     printf("AUTOMATED_SEARCH_END\n");
+    fflush(stdout);
 }
 
 void showMenu() {
@@ -219,9 +247,10 @@ void showMenu() {
     printf("2. Process Documents\n");
     printf("3. Show Search History\n");
     printf("4. Undo Last Search\n");
-    printf("5. Trace Path Between Keywords\n");  // NEW OPTION
+    printf("5. Trace Path Between Keywords\n");
     printf("6. Exit\n");
     printf("Choose an option: ");
+    fflush(stdout);
 }
 
 // Modified main function to handle command-line arguments
@@ -241,6 +270,7 @@ int main(int argc, char *argv[]) {
     
     // Original interactive mode
     printf("Initializing Knowledge Graph Search System...\n");
+    fflush(stdout);
     
     // First, process any existing documents
     processAllDocuments("../documents");
@@ -256,6 +286,7 @@ int main(int argc, char *argv[]) {
         switch (choice) {
             case 1:
                 printf("Enter search term: ");
+                fflush(stdout);
                 fgets(searchTerm, sizeof(searchTerm), stdin);
                 searchTerm[strcspn(searchTerm, "\n")] = 0; // Remove newline
                 searchKeywordForAPI(searchTerm);
@@ -273,11 +304,14 @@ int main(int argc, char *argv[]) {
                     
                     if (historyCount > 0) {
                         printf("\nSearch History:\n");
+                        fflush(stdout);
                         for (int i = 0; i < historyCount; i++) {
                             printf("%d. %s\n", i + 1, history[i]);
+                            fflush(stdout);
                         }
                     } else {
                         printf("No search history available.\n");
+                        fflush(stdout);
                     }
                 }
                 break;
@@ -287,17 +321,20 @@ int main(int argc, char *argv[]) {
                     char* lastSearch = pop(undoStack);
                     push(redoStack, lastSearch);
                     printf("Undo: Returning to previous search\n");
+                    fflush(stdout);
                 } else {
                     printf("No searches to undo.\n");
+                    fflush(stdout);
                 }
                 break;
                 
-            case 5:  // NEW CASE
+            case 5:
                 tracePathBetweenKeywords();
                 break;
                 
             case 6:
                 printf("Exiting system. Goodbye!\n");
+                fflush(stdout);
                 freeTrie(trie);
                 freeHashTable(hashTable);
                 freeGraph(graph);
@@ -308,6 +345,7 @@ int main(int argc, char *argv[]) {
                 
             default:
                 printf("Invalid option. Please try again.\n");
+                fflush(stdout);
         }
     }
     
